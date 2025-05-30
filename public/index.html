@@ -71,7 +71,15 @@
         return false;
       }
 
-      window.location.href = "/dashboard";
+      const data = await res.json();
+      document.body.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://app.powerbi.com/view?r=${data.token}`;
+      iframe.style.width = "100vw";
+      iframe.style.height = "100vh";
+      iframe.style.border = "none";
+      iframe.allowFullscreen = true;
+      document.body.appendChild(iframe);
     }
   </script>
 </body>
