@@ -1,7 +1,7 @@
 const express = require("express");
-const session = require("express-session");
 const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
+const session = require("express-session");
 const path = require("path");
 
 const app = express();
@@ -9,15 +9,12 @@ const db = new sqlite3.Database("database.db");
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
-
 app.use(session({
-  secret: "goldpao_secret_key",
+  secret: "segredo_super_secreto",
   resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 30 * 60 * 1000 } // 30 minutos
+  saveUninitialized: false
 }));
 
-// Cria a tabela e usuário padrão
 db.serialize(() => {
   db.run("CREATE TABLE IF NOT EXISTS users (usuario TEXT, senha TEXT, token TEXT)");
   db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
@@ -31,48 +28,35 @@ db.serialize(() => {
   });
 });
 
-// Página de login
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Dashboard protegido
-app.get("/dashboard", (req, res) => {
-  if (!req.session.usuario) return res.redirect("/");
-  
-  db.get("SELECT token FROM users WHERE usuario = ?", [req.session.usuario], (err, row) => {
-    if (err || !row) return res.redirect("/");
-
-    res.send(`
-      <!DOCTYPE html>
-      <html lang="pt-br">
-      <head>
-        <meta charset="UTF-8">
-        <title>Dashboard</title>
-        <style>
-          html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-          iframe { width: 100vw; height: 100vh; border: none; }
-        </style>
-      </head>
-      <body>
-        <iframe src="https://app.powerbi.com/view?r=${row.token}" allowfullscreen></iframe>
-      </body>
-      </html>
-    `);
-  });
-});
-
-// Login
 app.post("/login", (req, res) => {
   const { usuario, senha } = req.body;
   db.get("SELECT * FROM users WHERE usuario = ? AND senha = ?", [usuario, senha], (err, row) => {
     if (row) {
-      req.session.usuario = row.usuario;
+      req.session.loggedIn = true;
+      req.session.token = row.token;
       res.json({ success: true });
     } else {
-      res.status(401).json({ error: "Credenciais inválidas" });
+      res.status(401).json({ error: "Credenciais inválidas." });
     }
   });
+});
+
+app.get("/dashboard", (req, res) => {
+  if (!req.session.loggedIn) {
+    return res.redirect("/");
+  }
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
+
+app.get("/getPowerBiToken", (req, res) => {
+  if (!req.session.loggedIn) {
+    return res.status(403).json({ error: "Não autorizado." });
+  }
+  res.json({ token: req.session.token });
 });
 
 const PORT = process.env.PORT || 3000;

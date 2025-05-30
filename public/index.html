@@ -66,11 +66,12 @@
         body: JSON.stringify({ usuario, senha }),
       });
 
-      if (res.ok) {
-        window.location.href = "/dashboard";
-      } else {
+      if (!res.ok) {
         document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+        return false;
       }
+
+      window.location.href = "/dashboard";
     }
   </script>
 </body>
