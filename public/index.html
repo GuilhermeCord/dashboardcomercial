@@ -57,13 +57,16 @@
       const res = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, senha })
+        body: JSON.stringify({ usuario, senha }),
       });
 
-      if (res.ok) {
-        window.location.href = "/powerbi";
-      } else {
+      if (!res.ok) {
         document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+      } else {
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
       }
     }
   </script>

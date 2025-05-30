@@ -1,5 +1,4 @@
 const express = require("express");
-const session = require("express-session");
 const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -9,13 +8,6 @@ const db = new sqlite3.Database("database.db");
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
-
-app.use(session({
-  secret: "goldpao_super_secret",
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // true apenas com HTTPS
-}));
 
 db.serialize(() => {
   db.run("CREATE TABLE IF NOT EXISTS users (usuario TEXT, senha TEXT, token TEXT)");
@@ -38,27 +30,17 @@ app.post("/login", (req, res) => {
   const { usuario, senha } = req.body;
   db.get("SELECT * FROM users WHERE usuario = ? AND senha = ?", [usuario, senha], (err, row) => {
     if (row) {
-      req.session.loggedIn = true;
-      res.json({ success: true });
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><title>Dashboard</title></head>
+        <body style="margin:0;padding:0">
+          <iframe src="https://app.powerbi.com/view?r=${row.token}" style="width:100vw;height:100vh;border:none;"></iframe>
+        </body>
+        </html>
+      `);
     } else {
-      res.status(401).json({ error: "Credenciais inválidas" });
-    }
-  });
-});
-
-app.get("/powerbi", (req, res) => {
-  if (!req.session.loggedIn) {
-    return res.redirect("/");
-  }
-  db.get("SELECT token FROM users LIMIT 1", (err, row) => {
-    if (row?.token) {
-      res.send(\`
-        <html><body style="margin:0">
-          <iframe src="https://app.powerbi.com/view?r=\${row.token}" style="width:100vw; height:100vh;" allowfullscreen></iframe>
-        </body></html>
-      \`);
-    } else {
-      res.status(500).send("Token não encontrado.");
+      res.status(401).send("Credenciais inválidas.");
     }
   });
 });
