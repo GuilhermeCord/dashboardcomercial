@@ -44,7 +44,7 @@
   <div id="loginBox">
     <img src="GoldpaoLogo.png" alt="GoldPão" style="max-width: 200px; margin-bottom: 20px;" />
     <h2 style="color: #E3B001;">Acesso ao Dashboard</h2>
-
+    
     <form onsubmit="return login(event)">
       <input type="text" id="username" placeholder="Usuário" required />
       <input type="password" id="password" placeholder="Senha" required />
@@ -55,7 +55,7 @@
 
   <script>
     async function login(event) {
-      if (event) event.preventDefault();
+      if (event) event.preventDefault(); // Impede recarregamento
 
       const usuario = document.getElementById("username").value.trim();
       const senha = document.getElementById("password").value;

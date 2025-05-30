@@ -2,13 +2,11 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 
 const app = express();
 const db = new sqlite3.Database("database.db");
 
 app.use(bodyParser.json());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 db.serialize(() => {
@@ -34,24 +32,10 @@ app.post("/login", (req, res) => {
     if (row) {
       res.send(`
         <!DOCTYPE html>
-        <html lang="pt-br">
-        <head>
-          <meta charset="UTF-8">
-          <title>Dashboard</title>
-          <style>
-            body {
-              margin: 0;
-              background-color: #0D0C15;
-            }
-            iframe {
-              width: 100vw;
-              height: 100vh;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="https://app.powerbi.com/view?r=${row.token}"></iframe>
+        <html>
+        <head><meta charset="UTF-8"><title>Dashboard</title></head>
+        <body style="margin:0;padding:0">
+          <iframe src="https://app.powerbi.com/view?r=${row.token}" style="width:100vw;height:100vh;border:none;"></iframe>
         </body>
         </html>
       `);
