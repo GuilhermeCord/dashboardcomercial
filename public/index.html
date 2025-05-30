@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -44,7 +45,6 @@
   <div id="loginBox">
     <img src="GoldpaoLogo.png" alt="GoldPão" style="max-width: 200px; margin-bottom: 20px;" />
     <h2 style="color: #E3B001;">Acesso ao Dashboard</h2>
-
     <form onsubmit="return login(event)">
       <input type="text" id="username" placeholder="Usuário" required />
       <input type="password" id="password" placeholder="Senha" required />
@@ -52,11 +52,9 @@
       <p id="error" style="color:red;"></p>
     </form>
   </div>
-
   <script>
     async function login(event) {
       event.preventDefault();
-
       const usuario = document.getElementById("username").value.trim();
       const senha = document.getElementById("password").value;
 
@@ -66,20 +64,12 @@
         body: JSON.stringify({ usuario, senha }),
       });
 
-      if (!res.ok) {
-        document.getElementById("error").innerText = "Usuário ou senha incorretos!";
-        return false;
-      }
-
       const data = await res.json();
-      document.body.innerHTML = "";
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://app.powerbi.com/view?r=${data.token}`;
-      iframe.style.width = "100vw";
-      iframe.style.height = "100vh";
-      iframe.style.border = "none";
-      iframe.allowFullscreen = true;
-      document.body.appendChild(iframe);
+      if (res.ok && data && data.token) {
+        window.open(`https://app.powerbi.com/view?r=${data.token}`, "_blank");
+      } else {
+        document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+      }
     }
   </script>
 </body>
