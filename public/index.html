@@ -44,39 +44,12 @@
   <div id="loginBox">
     <img src="GoldpaoLogo.png" alt="GoldPão" style="max-width: 200px; margin-bottom: 20px;" />
     <h2 style="color: #E3B001;">Acesso ao Dashboard</h2>
-    
-    <form onsubmit="return login(event)">
-      <input type="text" id="username" placeholder="Usuário" required />
-      <input type="password" id="password" placeholder="Senha" required />
+    <form method="POST" action="/login">
+      <input type="text" name="usuario" id="username" placeholder="Usuário" required />
+      <input type="password" name="senha" id="password" placeholder="Senha" required />
       <button type="submit">Entrar</button>
-      <p id="error" style="color:red;"></p>
     </form>
+    <p id="error" style="color:red;"></p>
   </div>
-
-  <script>
-    async function login(event) {
-      if (event) event.preventDefault(); // Impede recarregamento
-
-      const usuario = document.getElementById("username").value.trim();
-      const senha = document.getElementById("password").value;
-
-      const res = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, senha }),
-      });
-
-      if (!res.ok) {
-        document.getElementById("error").innerText = "Usuário ou senha incorretos!";
-        return false;
-      } else {
-        const html = await res.text();
-        document.open();
-        document.write(html);
-        document.close();
-        return true;
-      }
-    }
-  </script>
 </body>
 </html>
