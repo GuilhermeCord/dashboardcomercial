@@ -1,14 +1,13 @@
+
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const path = require("path");
 
 const app = express();
 const db = new sqlite3.Database("database.db");
 
 app.use(bodyParser.json());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 db.serialize(() => {
@@ -32,34 +31,11 @@ app.post("/login", (req, res) => {
   const { usuario, senha } = req.body;
   db.get("SELECT * FROM users WHERE usuario = ? AND senha = ?", [usuario, senha], (err, row) => {
     if (row) {
-      res.cookie("logado", "true", { httpOnly: true });
-      res.redirect("/dashboard");
+      res.json({ token: row.token });
     } else {
-      res.status(401).send("Credenciais inválidas.");
+      res.status(401).json({ error: "Credenciais inválidas" });
     }
   });
-});
-
-app.get("/dashboard", (req, res) => {
-  if (req.cookies.logado === "true") {
-    db.get("SELECT token FROM users LIMIT 1", (err, row) => {
-      if (row && row.token) {
-        res.send(`
-          <!DOCTYPE html>
-          <html lang="pt-br">
-          <head><meta charset="UTF-8"><title>Dashboard</title></head>
-          <body style="margin:0;padding:0">
-            <iframe src="https://app.powerbi.com/view?r=${row.token}" style="width:100vw;height:100vh;border:none;" allowfullscreen></iframe>
-          </body>
-          </html>
-        `);
-      } else {
-        res.status(500).send("Token não encontrado.");
-      }
-    });
-  } else {
-    res.redirect("/");
-  }
 });
 
 const PORT = process.env.PORT || 3000;

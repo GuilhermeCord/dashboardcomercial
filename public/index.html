@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -38,17 +39,49 @@
       color: white;
       border: none;
     }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <div id="loginBox">
     <img src="GoldpaoLogo.png" alt="GoldPão" style="max-width: 200px; margin-bottom: 20px;" />
     <h2 style="color: #E3B001;">Acesso ao Dashboard</h2>
-    <form method="POST" action="/login">
-      <input type="text" name="usuario" placeholder="Usuário" required />
-      <input type="password" name="senha" placeholder="Senha" required />
+
+    <form onsubmit="return login(event)">
+      <input type="text" id="username" placeholder="Usuário" required />
+      <input type="password" id="password" placeholder="Senha" required />
       <button type="submit">Entrar</button>
+      <p id="error" style="color:red;"></p>
     </form>
   </div>
+
+  <script>
+    async function login(event) {
+      event.preventDefault();
+      const usuario = document.getElementById("username").value.trim();
+      const senha = document.getElementById("password").value;
+
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, senha }),
+      });
+
+      if (!res.ok) {
+        document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+        return false;
+      }
+
+      const data = await res.json();
+      document.body.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://app.powerbi.com/view?r=${data.token}`;
+      document.body.appendChild(iframe);
+    }
+  </script>
 </body>
 </html>
