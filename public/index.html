@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -39,9 +38,6 @@
       color: white;
       border: none;
     }
-    #error {
-      color: red;
-    }
   </style>
 </head>
 <body>
@@ -51,7 +47,7 @@
     <input type="text" id="username" placeholder="Usuário" />
     <input type="password" id="password" placeholder="Senha" />
     <button onclick="login()">Entrar</button>
-    <p id="error"></p>
+    <p id="error" style="color:red;"></p>
   </div>
 
   <script>
@@ -65,17 +61,13 @@
         body: JSON.stringify({ usuario, senha }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        const iframe = document.createElement("iframe");
-        iframe.src = data.powerbi;
-        iframe.style.width = "100vw";
-        iframe.style.height = "100vh";
-        iframe.style.border = "none";
-        document.body.innerHTML = "";
-        document.body.appendChild(iframe);
-      } else {
+      if (!res.ok) {
         document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+      } else {
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
       }
     }
   </script>
