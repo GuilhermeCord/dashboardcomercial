@@ -32,10 +32,28 @@ app.post("/login", (req, res) => {
     if (row) {
       res.send(`
         <!DOCTYPE html>
-        <html>
-        <head><meta charset="UTF-8"><title>Dashboard</title></head>
-        <body style="margin:0;padding:0">
-          <iframe src="https://app.powerbi.com/view?r=${row.token}" style="width:100vw;height:100vh;border:none;"></iframe>
+        <html lang="pt-br">
+        <head>
+          <meta charset="UTF-8">
+          <title>Dashboard</title>
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              overflow: hidden;
+              height: 100%;
+              width: 100%;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+              display: block;
+            }
+          </style>
+        </head>
+        <body>
+          <iframe src="https://app.powerbi.com/view?r=${row.token}" allowfullscreen></iframe>
         </body>
         </html>
       `);
