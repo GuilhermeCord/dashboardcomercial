@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Dashboard GoldPão</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #loginBox {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+    input, button {
+      margin: 10px 0;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #0078d4;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginBox">
+    <img src="GoldpaoLogo.png" alt="GoldPão" style="max-width: 200px; margin-bottom: 20px;" />
+    <h2>Acesso ao Dashboard</h2>
+    <input type="text" id="username" placeholder="Usuário" />
+    <input type="password" id="password" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <script>
+    async function login() {
+      const usuario = document.getElementById("username").value.trim();
+      const senha = document.getElementById("password").value;
+
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, senha })
+      });
+
+      if (res.ok) {
+        window.location.href = "/powerbi";
+      } else {
+        document.getElementById("error").innerText = "Usuário ou senha incorretos!";
+      }
+    }
+  </script>
+</body>
+</html>
