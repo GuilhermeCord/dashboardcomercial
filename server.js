@@ -1,3 +1,4 @@
+
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
@@ -30,35 +31,9 @@ app.post("/login", (req, res) => {
   const { usuario, senha } = req.body;
   db.get("SELECT * FROM users WHERE usuario = ? AND senha = ?", [usuario, senha], (err, row) => {
     if (row) {
-      res.send(`
-        <!DOCTYPE html>
-        <html lang="pt-br">
-        <head>
-          <meta charset="UTF-8">
-          <title>Dashboard</title>
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              overflow: hidden;
-              height: 100%;
-              width: 100%;
-            }
-            iframe {
-              width: 100%;
-              height: 100%;
-              border: none;
-              display: block;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="https://app.powerbi.com/view?r=${row.token}" allowfullscreen></iframe>
-        </body>
-        </html>
-      `);
+      res.json({ token: row.token });
     } else {
-      res.status(401).send("Credenciais inválidas.");
+      res.status(401).json({ error: "Credenciais inválidas." });
     }
   });
 });
